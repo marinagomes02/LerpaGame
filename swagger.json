@@ -1,0 +1,289 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Lerpa",
+    "version": "1.0"
+  },
+  "tags": [
+    {
+      "name": "Players"
+    },
+    {
+      "name": "Games"
+    }
+  ],
+  "paths": {
+    "/lerpa/players": {
+      "post": {
+        "tags": [
+          "Players"
+        ],
+        "description": "Create a new player",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "player",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Player"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully created player"
+          },
+          "400": {
+            "description": "Invalid fields"
+          },
+          "409": {
+            "description": "A player with that username already exists"
+          }
+        }
+      }
+    },
+    "/lerpa/players/{username}": {
+      "get": {
+        "tags": [
+          "Players"
+        ],
+        "description": "Get player by username",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "username",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully found player",
+            "schema": {
+              "$ref": "#/definitions/Player"
+            }
+          },
+          "400": {
+            "description": "Invalid username"
+          },
+          "404": {
+            "description": "Player not found"
+          }
+        }
+      }
+    },
+    "/lerpa/games": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Create a new game",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "game",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/GameCreateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully created new game",
+            "schema": {
+              "$ref": "#/definitions/Game"
+            }
+          },
+          "400": {
+            "description": "Invalid usernames"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Get the active game",
+        "responses": {
+          "200": {
+            "description": "Successfully found the active game",
+            "schema": {
+              "$ref": "#/definitions/Game"
+            }
+          },
+          "404": {
+            "description": "Game not found"
+          }
+        }
+      }
+    },
+    "/lerpa/games/{game_id}/end": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "End active game",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully ended the game"
+          },
+          "400": {
+            "description": "Invalid game_id"
+          },
+          "404": {
+            "description": "Game not found"
+          },
+          "409": {
+            "description": "Game is not active"
+          }
+        }
+      }
+    },
+    "/lerpa/games/{game_id}/step": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "description": "Add step to the game",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "game_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "step",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Step"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucessfully added new step"
+          },
+          "400": {
+            "description": "Invalid step"
+          },
+          "404": {
+            "description": "Game not found"
+          },
+          "409": {
+            "description": "Game has been ended"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GameCreateRequest": {
+      "type": "object",
+      "required": [
+        "players"
+      ],
+      "properties": {
+        "players": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GamePlayer": {
+      "type": "object",
+      "required": [
+        "steps",
+        "player",
+        "score"
+      ],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "player": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Player"
+          }
+        },
+        "score": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "Game": {
+      "type": "object",
+      "required": [
+        "id",
+        "gamePlayers"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "gamePlayers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GamePlayer"
+          }
+        }
+      }
+    },
+    "Player": {
+      "type": "object",
+      "required": [
+        "username",
+        "firstName",
+        "lastName"
+      ],
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        }
+      }
+    },
+    "Step": {
+      "type": "object",
+      "required": [
+        "username",
+        "play"
+      ],
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "play": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    }
+  }
+}
